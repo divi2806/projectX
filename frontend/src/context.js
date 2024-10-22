@@ -42,7 +42,7 @@ const AppProvider = ({ children }) => {
       setProcessing(true);
       
       // Sending the user query to the backend server, which then forwards it to the Python backend
-      const res = await fetch(`http://localhost:5500/ask`, {
+      const res = await fetch(`https://pdh-school-complete.onrender.com/ask`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
