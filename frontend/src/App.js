@@ -8,6 +8,7 @@ import { auth } from "./firebase";
 import Home from "./pages/Home/Home";
 import { ThreeCircles } from "react-loader-spinner";
 import ContactUs from "./pages/ContactUs/ContactUs";
+import TeacherPanel from "./pages/TeacherPanel/TeacherPanel";
 // initially line 51 mai signup page ko redirect kra tha.
 
 function App() {
@@ -53,6 +54,7 @@ function App() {
             <Route path="/login" element={<LogIn />} />
             <Route path="/chatbox" element={<ChatBox name={userName} />} />
             <Route path="/contactus" element={<ContactUs />} />
+            <Route path="/teacher-panel" element={<TeacherPanel />} />
           </Routes>
         </Router>
       )}

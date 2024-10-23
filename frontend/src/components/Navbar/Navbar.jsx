@@ -56,6 +56,16 @@ const Navbar = () => {
             </li>
             <li className="nav-item">
               <Link
+                to="/teacher-panel"
+                activeClassName="active"
+                className="nav-links"
+                onClick={click ? handleClick : null}
+              >
+                Teacher Panel
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
                 to="/contactus"
                 activeClassName="active"
                 className="nav-links"
