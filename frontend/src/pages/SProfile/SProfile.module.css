@@ -1,0 +1,264 @@
+.loadcontainer {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url(../../assets/background3.jpg);
+  background-size: cover;
+  background-position: center;
+  overflow: auto;
+  padding: 2rem 0;
+}
+
+.innerBox {
+  max-height: none;
+  width: 90%;
+  max-width: 1200px;
+  background-color: #fff;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  font-family: "Orbitron", sans-serif;
+}
+
+.leftSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.heading {
+  margin: 0;
+  color: #046cf1;
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: "Orbitron", sans-serif;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  background-color: #046cf1;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  font-family: "Orbitron", sans-serif;
+}
+
+.welcome {
+  font-size: 1.2rem;
+  color: #333;
+  text-align: center;
+  font-family: "Orbitron", sans-serif;
+}
+
+.formContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  align-content: start;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  color: #313131;
+  font-weight: 500;
+  font-family: "Orbitron", sans-serif;
+}
+
+.input {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  font-family: "Orbitron", sans-serif;
+}
+
+.input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.memberSince {
+  color: #666;
+  font-size: 0.9rem;
+  text-align: center;
+  font-family: "Orbitron", sans-serif;
+  margin-top: auto;
+}
+
+.passwordSection {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.subheading {
+  color: #046cf1;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-family: "Orbitron", sans-serif;
+}
+
+.footer {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.error {
+  font-weight: bold;
+  font-size: 0.875rem;
+  color: #ff3300;
+  text-align: center;
+}
+
+.success {
+  font-weight: bold;
+  font-size: 0.875rem;
+  color: #00cc00;
+  text-align: center;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.button {
+  outline: none;
+  border: none;
+  background-color: #046cf1;
+  color: #fff;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  padding: 0.75rem 1.5rem;
+  min-width: 120px;
+  transition: 100ms;
+  cursor: pointer;
+  font-family: "Orbitron", sans-serif;
+}
+
+.button:disabled {
+  background-color: gray !important;
+}
+
+.button:hover {
+  background-color: #0d4ad9;
+  transform: translateY(-2px);
+}
+
+.saveButton {
+  background-color: #046cf1;
+}
+
+.cancelButton {
+  background-color: #666;
+}
+
+.logoutButton {
+  background-color: #ff3300;
+}
+
+.logoutButton:hover {
+  background-color: #cc2900;
+}
+
+@media screen and (max-width: 1024px) {
+  .innerBox {
+    grid-template-columns: 1fr;
+  }
+
+  .formContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    grid-column: 1;
+  }
+
+  .passwordSection {
+    margin-top: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .innerBox {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .passwordSection {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+  
+  .subheading {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+}

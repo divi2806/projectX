@@ -1,14 +1,35 @@
-import React, { useState } from "react";
-import "./Navbar.css";
-import { Link } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Icons from "@fortawesome/fontawesome-free-solid";
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
+import { User, LogIn } from "lucide-react";
+import "./Navbar.css";
 
 const Navbar = () => {
   const [click, setClick] = useState(false);
-  const [isSignOut, setIsSignOut] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const userMenuRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleClick = () => setClick(!click);
   const Close = () => setClick(false);
@@ -16,7 +37,7 @@ const Navbar = () => {
   const signOutHandler = () => {
     signOut(auth)
       .then(() => {
-        setIsSignOut(true);
+        setShowUserMenu(false);
         alert("Sign out Successfully!");
       })
       .catch((err) => {
@@ -24,73 +45,95 @@ const Navbar = () => {
       });
   };
 
+  const handleUpdateProfile = () => {
+    navigate('/sprofile');
+    setShowUserMenu(false);
+  };
+
   return (
-    <>
-      <div className={click ? "main-container" : ""} onClick={() => Close()} />
-      <nav className="navbar" onClick={(e) => e.stopPropagation()}>
-        <div className="nav-container">
-          <Link to="/home" className="nav-logo">
-            PDH School Of Learning
-            {/* <FontAwesomeIcon icon={Icons.fax} size="6px" /> */}
-          </Link>
-          <ul className={click ? "nav-menu active" : "nav-menu"}>
-            <li className="nav-item">
-              <Link
-                to="/home"
-                activeClassName="active"
-                className="nav-links"
-                onClick={click ? handleClick : null}
-              >
-                Home
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                to="/chatbox"
-                activeClassName="active"
-                className="nav-links"
-                onClick={click ? handleClick : null}
-              >
-                ChatBot
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                to="/teacher-panel"
-                activeClassName="active"
-                className="nav-links"
-                onClick={click ? handleClick : null}
-              >
-                Teacher Panel
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                to="/contactus"
-                activeClassName="active"
-                className="nav-links"
-                onClick={click ? handleClick : null}
-              >
-                Contact Us
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                to="/login"
-                activeClassName="active"
-                className="nav-links"
-                onClick={signOutHandler}
-              >
-                {isSignOut === true ? "SignIn or LogIn" : "Sign Out"}
-              </Link>
-            </li>
-          </ul>
-          <div className="nav-icon" onClick={handleClick}>
-            <FontAwesomeIcon icon={click ? Icons.faTimes : Icons.faBars} />
+    <div className="navbar">
+      <div className="nav-container">
+        <Link to="/" className="nav-logo">
+          PDH School Of Learning
+        </Link>
+        
+        <div className={click ? "nav-menu active" : "nav-menu"}>
+          <div className="nav-item">
+            <Link to="/" className="nav-links" onClick={click ? Close : null}>
+              Home
+            </Link>
           </div>
+          
+          <div className="nav-item">
+            <Link to="/chatbox" className="nav-links" onClick={click ? Close : null}>
+              Student chatbot
+            </Link>
+          </div>
+          
+          <div className="nav-item">
+            <Link to="/teacher-panel" className="nav-links" onClick={click ? Close : null}>
+              Teacher Panel
+            </Link>
+          </div>
+          
+          <div className="nav-item">
+            <Link to="/contactus" className="nav-links" onClick={click ? Close : null}>
+              Contact Us
+            </Link>
+          </div>
+
+          {!currentUser ? (
+            <div className="nav-item">
+              <Link to="/login" className="nav-links auth-button">
+                <LogIn className="inline-block mr-2" size={20} />
+                Login / Signup
+              </Link>
+            </div>
+          ) : (
+            <div className="nav-item user-profile" ref={userMenuRef}>
+              <div 
+                className="nav-links user-info" 
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <div className="avatar">
+                  {currentUser.photoURL ? (
+                    <img 
+                      src={currentUser.photoURL} 
+                      alt="user avatar" 
+                      className="avatar-img"
+                    />
+                  ) : (
+                    <div className="avatar-placeholder">
+                      {currentUser.displayName?.charAt(0) || currentUser.email?.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <span className="username">
+                  {currentUser.displayName || currentUser.email?.split('@')[0]}
+                </span>
+              </div>
+              
+              {showUserMenu && (
+                <div className="user-dropdown">
+                  <button onClick={handleUpdateProfile} className="dropdown-item">
+                    <User size={16} className="mr-2" />
+                    Update Profile
+                  </button>
+                  <button onClick={signOutHandler} className="dropdown-item">
+                    <LogIn size={16} className="mr-2" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      </nav>
-    </>
+
+        <div className="nav-icon" onClick={handleClick}>
+          <FontAwesomeIcon icon={click ? "times" : "bars"} />
+        </div>
+      </div>
+    </div>
   );
 };
 

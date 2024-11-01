@@ -1,56 +1,141 @@
-/* 
-font-family: 'Castoro', serif;
-font-family: 'Chakra Petch', sans-serif;
-font-family: 'Orbitron', sans-serif;
-font-family: 'Ubuntu Mono', monospace; 
-*/
-
-.main {
-  padding: 30px;
+/* ChatBox.module.css */
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background-image: url(../../assets/background3.jpg);
   background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
 }
 
-.loadcontainer {
-  height: 100vh;
+.pageContent {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.loadContainer {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: calc(100vh - 180px); /* Account for navbar and footer */
 }
 
-.container {
-  margin: 0 auto;
-  height: calc(100vh - 60px);
-  width: 100%;
+.chatContainer {
   max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  height: calc(100vh - 180px); /* Adjusted for navbar and footer */
   display: flex;
   flex-direction: column;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  backdrop-filter: blur(10px);
 }
 
-.container .header {
+.userHeader {
   background-color: #edf2f7;
   display: flex;
   justify-content: space-between;
-  padding: 10px;
-  font-family: 'Chakra Petch', sans-serif;
+  padding: 15px 20px;
   align-items: center;
-}
-
-.link {
-  color: #046cf1;
-  cursor: pointer;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  height: 100%;
-  border-bottom: 3px solid transparent;
   font-family: 'Chakra Petch', sans-serif;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.link:hover {
-  color: #0d4ad9;
-  cursor: pointer;
+.userHeader h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.authLink {
+  color: #046cf1;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.authLink:hover {
+  background-color: #046cf1;
+  color: white;
+}
+
+.chatInterface {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Media Queries for Responsive Design */
+@media screen and (max-width: 768px) {
+  .pageContent {
+    padding: 10px;
+  }
+
+  .chatContainer {
+    height: calc(100vh - 160px);
+  }
+
+  .userHeader {
+    padding: 10px 15px;
+  }
+
+  .userHeader h2 {
+    font-size: 1rem;
+  }
+
+  .authLink {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .pageContent {
+    padding: 5px;
+  }
+
+  .chatContainer {
+    border-radius: 0;
+  }
+
+  .userHeader {
+    padding: 8px 12px;
+  }
+
+  .authLink {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Scrollbar Styling */
+.chatInterface::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chatInterface::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.chatInterface::-webkit-scrollbar-thumb {
+  background: #046cf1;
+  border-radius: 3px;
+}
+
+.chatInterface::-webkit-scrollbar-thumb:hover {
+  background: #0354c9;
 }

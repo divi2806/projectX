@@ -9,6 +9,8 @@ import Home from "./pages/Home/Home";
 import { ThreeCircles } from "react-loader-spinner";
 import ContactUs from "./pages/ContactUs/ContactUs";
 import TeacherPanel from "./pages/TeacherPanel/TeacherPanel";
+import SProfile from "./pages/SProfile/SProfile";
+
 // initially line 51 mai signup page ko redirect kra tha.
 
 function App() {
@@ -55,6 +57,8 @@ function App() {
             <Route path="/chatbox" element={<ChatBox name={userName} />} />
             <Route path="/contactus" element={<ContactUs />} />
             <Route path="/teacher-panel" element={<TeacherPanel />} />
+            <Route path="/sprofile" element={<SProfile />} />
+            <Route path="/signup" element={<SignUp />} />
           </Routes>
         </Router>
       )}

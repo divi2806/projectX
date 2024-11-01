@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { auth, db } from "../../firebase";
+import { doc, getDoc } from "firebase/firestore";
 import InputControl from "../../components/InputControl/InputControl";
 import styles from "./LogIn.module.css";
 import { ThreeCircles } from "react-loader-spinner";
@@ -16,6 +17,7 @@ const LogIn = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [submitButtonDisabled, setSubmitButtonDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     setLoading(true);
     setTimeout(() => {
@@ -23,7 +25,7 @@ const LogIn = () => {
     }, 2000);
   }, []);
 
-  const handleSubmission = (e) => {
+  const handleSubmission = async () => {
     if (!values.email || !values.pass) {
       setErrorMsg("Please Fill all fields");
       setTimeout(() => {
@@ -46,21 +48,31 @@ const LogIn = () => {
     setErrorMsg("");
 
     setSubmitButtonDisabled(true);
-    signInWithEmailAndPassword(auth, values.email, values.pass)
-      .then(async (res) => {
-        setSubmitButtonDisabled(false);
+    try {
+      const res = await signInWithEmailAndPassword(auth, values.email, values.pass);
+      const userDoc = await getDoc(doc(db, "users", res.user.uid));
+      const userData = userDoc.data();
+      
+      // Store user role in localStorage for easy access
+      localStorage.setItem("userRole", userData.role);
+      localStorage.setItem("userPermissions", JSON.stringify(userData.permissions));
 
-        navigate("/home");
-      })
-      .catch((err) => {
-        setSubmitButtonDisabled(false);
-        setErrorMsg(err.message);
-        let emptyvals = { email: "", pass: "" };
-        setValues(emptyvals);
-        setTimeout(() => {
-          setErrorMsg("");
-        }, 3000);
-      });
+      setSubmitButtonDisabled(false);
+      
+      // Redirect based on role
+      if (userData.role === "teacher") {
+        navigate("/teacher-dashboard");
+      } else {
+        navigate("/student-dashboard");
+      }
+    } catch (err) {
+      setSubmitButtonDisabled(false);
+      setErrorMsg(err.message);
+      setValues({ email: "", pass: "" });
+      setTimeout(() => {
+        setErrorMsg("");
+      }, 3000);
+    }
   };
 
   return (
@@ -81,43 +93,42 @@ const LogIn = () => {
           />
         </div>
       ) : (
-        <div>
-          <div className={styles.container}>
-            <div className={styles.innerBox}>
-              <h1 className={styles.heading}>Login</h1>
+        <div className={styles.container}>
+          <div className={styles.innerBox}>
+            <h1 className={styles.heading}>Login</h1>
 
-              <InputControl
-                label="Email"
-                value={values.email}
-                onChange={(event) =>
-                  setValues((prev) => ({ ...prev, email: event.target.value }))
-                }
-                placeholder="Enter email address"
-              />
-              <InputControl
-                label="Password"
-                value={values.pass}
-                onChange={(event) =>
-                  setValues((prev) => ({ ...prev, pass: event.target.value }))
-                }
-                placeholder="Enter Password"
-              />
+            <InputControl
+              label="Email"
+              value={values.email}
+              onChange={(event) =>
+                setValues((prev) => ({ ...prev, email: event.target.value }))
+              }
+              placeholder="Enter email address"
+            />
+            <InputControl
+              label="Password"
+              type="password"
+              value={values.pass}
+              onChange={(event) =>
+                setValues((prev) => ({ ...prev, pass: event.target.value }))
+              }
+              placeholder="Enter Password"
+            />
 
-              <div className={styles.footer}>
-                <b className={styles.error}>{errorMsg}</b>
-                <button
-                  disabled={submitButtonDisabled}
-                  onClick={handleSubmission}
-                >
-                  Login
-                </button>
-                <p>
-                  Don't have an account?{" "}
-                  <span>
-                    <Link to="/">Sign up</Link>
-                  </span>
-                </p>
-              </div>
+            <div className={styles.footer}>
+              <b className={styles.error}>{errorMsg}</b>
+              <button
+                disabled={submitButtonDisabled}
+                onClick={handleSubmission}
+              >
+                Login
+              </button>
+              <p>
+                Don't have an account?{" "}
+                <span>
+                  <Link to="/signup">Sign up</Link>
+                </span>
+              </p>
             </div>
           </div>
         </div>
