@@ -10,11 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/pg": "^8.11.10",
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.21.1",
     "mongoose": "^8.8.0",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "pg": "^8.13.1"
   }
 }

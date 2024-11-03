@@ -61,9 +61,9 @@ const LogIn = () => {
       
       // Redirect based on role
       if (userData.role === "teacher") {
-        navigate("/teacher-dashboard");
+        navigate("/");
       } else {
-        navigate("/student-dashboard");
+        navigate("/");
       }
     } catch (err) {
       setSubmitButtonDisabled(false);

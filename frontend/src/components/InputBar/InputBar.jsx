@@ -6,19 +6,30 @@ import { useGlobalContext } from "../../context";
 const InputBar = () => {
   const { messageText, setMessageText, handleSubmission } = useGlobalContext();
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSubmission();
+    }
+  };
+
   return (
     <div className={styles.footer}>
       <input
         placeholder="Type here..."
         value={messageText}
         onChange={(event) => setMessageText(event.target.value)}
-        onKeyUp={(event) => (event.key === "Enter" ? handleSubmission() : "")}
+        onKeyPress={handleKeyPress}
       />
-      <div className={styles.btn} onClick={handleSubmission}>
+      <button 
+        className={styles.btn} 
+        onClick={handleSubmission}
+        disabled={!messageText.trim()}
+      >
         <div className={styles.icon}>
           <Send />
         </div>
-      </div>
+      </button>
     </div>
   );
 };

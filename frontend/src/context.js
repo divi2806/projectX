@@ -1,24 +1,64 @@
-// context.js
-import React, { createContext, useContext, useRef, useState } from "react";
+import React, { createContext, useContext, useRef, useState, useEffect } from "react";
+import { auth } from "./firebase";
 
-// Create the context
 const AppContext = createContext();
 
-// Define the AppProvider which manages the chatbox state and handles the message submission
 const AppProvider = ({ children }) => {
-  const lastMsg = useRef(); // To scroll to the last message automatically
-  const [messageText, setMessageText] = useState(""); // Store the text in the input field
-  const [messages, setMessages] = useState([
-    {
-      from: "ai",
-      text: "Hi there! I'm your tutor, I'm here to help you out with your questions. Ask me anything you want.",
-    },
-  ]); // Array to store chat messages
-  const [processing, setProcessing] = useState(false); // Flag to indicate if the query is being processed
+  const lastMsg = useRef();
+  const [messageText, setMessageText] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [processing, setProcessing] = useState(false);
+  const [userId, setUserId] = useState(null);
 
-  // Function to handle submission of user messages
+  useEffect(() => {
+    const loadMessages = async () => {
+      if (!userId) return;
+      
+      try {
+        const response = await fetch(`http://localhost:5500/messages/${userId}`);
+        const data = await response.json();
+        
+        // Filter out disapproved AI messages
+        const filteredMessages = data.filter(msg => 
+          msg.from !== 'ai' || msg.status !== 'disapproved'
+        );
+        
+        if (filteredMessages.length > 0) {
+          setMessages(filteredMessages);
+        } else {
+          setMessages([{
+            from: "ai",
+            text: "Hi there! I'm your tutor, I'm here to help you out with your questions. Ask me anything you want.",
+            status: 'approved'
+          }]);
+        }
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+      }
+    };
+
+    loadMessages();
+  }, [userId]);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+        setMessages([{
+          from: "ai",
+          text: "Hi there! I'm your tutor, I'm here to help you out with your questions. Ask me anything you want.",
+          status: 'approved'
+        }]);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleSubmission = async () => {
-    if (!messageText.trim() || processing) return; // Prevent empty or repeated submissions
+    if (!messageText.trim() || processing || !userId) return;
 
     const tempMessages = [
       ...messages,
@@ -28,65 +68,56 @@ const AppProvider = ({ children }) => {
       },
     ];
 
-    setMessages(tempMessages); // Update the chat messages with the new user input
-    setMessageText(""); // Clear the input field
+    setMessages(tempMessages);
+    setMessageText("");
 
-    // Automatically scroll to the last message after submission
-    setTimeout(() =>
-      lastMsg.current.scrollIntoView({
-        behavior: "smooth",
-      })
-    );
+    setTimeout(() => lastMsg.current?.scrollIntoView({ behavior: "smooth" }));
 
     try {
       setProcessing(true);
       
-      // Sending the user query to the backend server, which then forwards it to the Python backend
-      const res = await fetch(`https://pdh-school-complete.onrender.com/ask`, {
+      const res = await fetch(`http://localhost:5500/ask`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userQuery: messageText, // Pass the user query
+          userQuery: messageText,
+          userId,
         }),
       });
       
+      const data = await res.json();
+      
       setProcessing(false);
 
-      const data = await res.json();
-      const ans = data.data;
-
-      // Update the chat with the AI's response
-      setMessages((prev) => [
-        ...prev,
-        {
-          from: "ai",
-          text: ans.trim(),
-        },
-      ]);
+      if (data.success) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            from: "ai",
+            text: data.data.trim(),
+            status: 'pending'
+          },
+        ]);
+      } else {
+        throw new Error(data.message);
+      }
     } catch (err) {
-      const error = "Error processing this message. Please try again later.";
-      
-      // Handle errors by displaying an error message in the chat
       setMessages((prev) => [
         ...prev,
         {
           from: "ai",
-          text: error,
+          text: "Error processing this message. Please try again later.",
+          status: 'approved'
         },
       ]);
+      setProcessing(false);
     }
 
-    // Scroll to the last message after receiving the response
-    setTimeout(() =>
-      lastMsg.current.scrollIntoView({
-        behavior: "smooth",
-      })
-    );
+    setTimeout(() => lastMsg.current?.scrollIntoView({ behavior: "smooth" }));
   };
 
-  // Providing the context values to the rest of the application
   return (
     <AppContext.Provider
       value={{
@@ -98,16 +129,13 @@ const AppProvider = ({ children }) => {
         messages,
         setMessages,
         handleSubmission,
+        userId,
       }}
     >
-      {children}
+      { children}
     </AppContext.Provider>
   );
 };
 
 export default AppProvider;
-
-// Hook to use the global context in other components
-export const useGlobalContext = () => {
-  return useContext(AppContext);
-};
+export const useGlobalContext = () => useContext(AppContext);

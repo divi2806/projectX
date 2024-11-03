@@ -1,85 +1,107 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./TeacherPanel.module.css";
 import StudentList from "../../components/StudentList/StudentList";
-import Chatbox from "../../components/Chatbox/Chatbox";
-
-const studentsData = [
-  { id: 1, name: "Ram" },
-  { id: 2, name: "Raman" },
-  { id: 3, name: "Ravi" },
-  { id: 4, name: "Radha" },
-];
+import TeacherChatbox from "../../components/TeacherChatbox/TeacherChatbox";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 
 const TeacherPanel = () => {
-  const [selectedStudent, setSelectedStudent] = useState(studentsData[0]);
+  const [students, setStudents] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const initialMessages = {
-    Ram: [
-      { id: 1, from: "AI", text: "Hello Ram, how can I help you today?", status: "pending" },
-      { id: 2, from: "Ram", text: "Can you tell all the vowels?", status: "approved" },
-      { id: 3, from: "AI", text: "Vowels are A,E,I,O,U.", status: "pending" },
-    ],
-    Raman: [
-      { id: 1, from: "AI", text: "Hello Raman, what would you like to learn?", status: "pending" },
-      { id: 2, from: "Raman", text: "What is the capital of France?", status: "approved" },
-      { id: 3, from: "AI", text: "The capital of France is Paris.", status: "pending" },
-    ],
-    Ravi: [
-      { id: 1, from: "AI", text: "Hi Ravi, how can I assist you?", status: "pending" },
-      { id: 2, from: "Ravi", text: "What is 2+2?", status: "approved" },
-      { id: 3, from: "AI", text: "2+2 is 4.", status: "pending" },
-    ],
-    Radha: [
-      { id: 1, from: "AI", text: "Hi Radha, do you have any questions?", status: "pending" },
-      { id: 2, from: "Radha", text: "Explain photosynthesis.", status: "approved" },
-      { id: 3, from: "AI", text: "Photosynthesis is the process by which plants make food.", status: "pending" },
-    ],
-  };
+  useEffect(() => {
+    fetchStudents();
+  }, []);
 
-  const [messages, setMessages] = useState(initialMessages[selectedStudent.name]);
+  useEffect(() => {
+    if (selectedStudent) {
+      fetchMessages(selectedStudent.uid);
+    }
+  }, [selectedStudent]);
 
-  const handleStudentChange = (student) => {
-    setSelectedStudent(student);
-    setMessages(initialMessages[student.name]);
-  };
-
-  const handleApproval = (messageId, action) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) =>
-        msg.id === messageId ? { ...msg, status: action } : msg
-      )
-    );
-
-    if (action === "disapproved") {
-      alert("This message has been disapproved.");
-    } else if (action === "approved") {
-      alert("This message has been approved.");
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch('http://localhost:5500/students');
+      const data = await response.json();
+      setStudents(data);
+      if (data.length > 0) setSelectedStudent(data[0]);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to fetch students');
+      setLoading(false);
     }
   };
 
-  const handleNewMessage = (newMessage) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { id: prevMessages.length + 1, from: "Teacher", text: newMessage, status: "approved" },
-    ]);
+  const fetchMessages = async (userId) => {
+    try {
+      const response = await fetch(`http://localhost:5500/messages/${userId}`);
+      const data = await response.json();
+      setMessages(data);
+    } catch (err) {
+      setError('Failed to fetch messages');
+    }
   };
+
+  const handleApproval = async (messageId, status) => {
+    try {
+      await fetch(`http://localhost:5500/messages/${messageId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      });
+      if (selectedStudent) {
+        fetchMessages(selectedStudent.uid);
+      }
+    } catch (err) {
+      setError('Failed to update message status');
+    }
+  };
+
+  const handleSendMessage = async (text) => {
+    try {
+      await fetch('http://localhost:5500/teacher-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text,
+          studentId: selectedStudent.uid,
+        }),
+      });
+      if (selectedStudent) {
+        fetchMessages(selectedStudent.uid);
+      }
+    } catch (err) {
+      setError('Failed to send message');
+    }
+  };
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <div className={styles.error}>{error}</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.sidebar}>
         <StudentList
-          students={studentsData}
+          students={students}
           selectedStudent={selectedStudent}
-          onStudentChange={handleStudentChange}
+          onStudentSelect={setSelectedStudent}
         />
       </div>
       <div className={styles.chatArea}>
-        <Chatbox
-          student={selectedStudent}
-          messages={messages}
-          onApprove={handleApproval}
-          onAddMessage={handleNewMessage}
-        />
+        {selectedStudent && (
+          <TeacherChatbox
+            student={selectedStudent}
+            messages={messages}
+            onApprove={handleApproval}
+            onSendMessage={handleSendMessage}
+          />
+        )}
       </div>
     </div>
   );

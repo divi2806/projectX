@@ -219,7 +219,7 @@ const SignUp = () => {
                 Signup
               </button>
               <p>
-                Already have an account?{" "}
+                Already have an account as teacher or student?{" "}
                 <span>
                   <Link to="/login">Login</Link>
                 </span>

@@ -1,0 +1,67 @@
+.messageWrapper {
+    display: flex;
+    margin: 10px 0;
+    padding: 0 15px;
+  }
+  
+  .messageContent {
+    max-width: 80%;
+    padding: 12px;
+    border-radius: 12px;
+    position: relative;
+  }
+  
+  .aiMessage .messageContent {
+    background-color: #f0f0f0;
+    margin-right: auto;
+  }
+  
+  .teacherMessage .messageContent {
+    background-color: #e3f2fd;
+    margin-right: auto;
+  }
+  
+  .userMessage .messageContent {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto;
+  }
+  
+  .teacherLabel {
+    font-weight: bold;
+    color: #1976d2;
+    margin-bottom: 4px;
+  }
+  
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  
+  .controlButton {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+  }
+  
+  .controlButton.active {
+    background: #4caf50;
+    color: white;
+    border-color: #4caf50;
+  }
+  
+  .controlButton.active:last-child {
+    background: #f44336;
+    border-color: #f44336;
+  }
+  
+  .controlButton:hover {
+    background: #f5f5f5;
+  }
+  
+  .controlButton.active:hover {
+    opacity: 0.9;
+  }

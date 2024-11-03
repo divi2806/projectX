@@ -24,7 +24,7 @@ const Profile = () => {
     fullName: "",
     email: "",
     gender: "",
-    country: "",
+    role: "",
     phoneNumber: "",
   });
 
@@ -44,7 +44,7 @@ const Profile = () => {
             fullName: userData.name || "",
             email: userData.email || "",
             gender: userData.gender || "",
-            country: userData.country || "",
+            role: userData.role || "",
             phoneNumber: userData.phone || "",
           });
         }
@@ -95,8 +95,8 @@ const Profile = () => {
         name: values.fullName,
         email: values.email,
         gender: values.gender,
-        country: values.country,
         phone: values.phoneNumber,
+        // Note: role is intentionally omitted from the update
       });
 
       setSuccessMsg("Profile updated successfully!");
@@ -172,7 +172,7 @@ const Profile = () => {
       fullName: user.displayName || "",
       email: user.email || "",
       gender: user.gender || "",
-      country: values.country || "",
+      role: values.role || "", // Keep the original role
       phoneNumber: user.phone || "",
     });
     setIsEditing(false);
@@ -280,22 +280,14 @@ const Profile = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label>Country</label>
-              <select
-                className={styles.input}
-                value={values.country}
-                onChange={(e) => 
-                  setValues((prev) => ({ ...prev, country: e.target.value }))
-                }
-                disabled={!isEditing}
-              >
-                <option value="">Select Country</option>
-                <option value="us">United States</option>
-                <option value="uk">United Kingdom</option>
-                <option value="in">India</option>
-                <option value="ca">Canada</option>
-                <option value="au">Australia</option>
-              </select>
+              <label>Role</label>
+              <input
+                className={`${styles.input} ${styles.roleInput}`}
+                type="text"
+                value={values.role}
+                disabled={true}
+                readOnly
+              />
             </div>
           </div>
 
